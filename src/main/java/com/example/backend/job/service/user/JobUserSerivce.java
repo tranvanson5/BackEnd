@@ -8,12 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 public interface JobUserSerivce {
-    ResponseEntity<?> getAllDataListJobUserBySearch( String search, String searchAddress,
+    ResponseEntity<?> getAllDataListJob( String search, String searchAddress,
                                                      JobEducation jobEducation,
                                                      JobExperience jobExperience,
                                                      JobPosition jobPosition,
                                                      JobType jobType,
-                                                     String salary,
+                                                     Integer salary,
                                                      Integer career,
                                                      Pageable pageable);
 }

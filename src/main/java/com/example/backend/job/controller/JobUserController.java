@@ -26,10 +26,10 @@ public class JobUserController {
                                                        @RequestParam(required = false) JobExperience jobExperience,
                                                        @RequestParam(required = false) JobPosition jobPosition,
                                                        @RequestParam(required = false) JobType jobType,
-                                                       @RequestParam(required = false) String salary,
+                                                       @RequestParam(required = false) Integer salary,
                                                        @RequestParam(required = false) Integer career,
                                                        @PageableDefault Pageable pageable){
-        return jobUserSerivce.getAllDataListJobUserBySearch( search, searchAddress,
+        return jobUserSerivce.getAllDataListJob( search, searchAddress,
                 jobEducation,
                 jobExperience,
                 jobPosition,

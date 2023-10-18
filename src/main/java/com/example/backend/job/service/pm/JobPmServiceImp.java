@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -71,40 +72,61 @@ public class JobPmServiceImp implements JobPmService{
     }
 
     @Override
-    public ResponseEntity<?> getDataJob(String search, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, Integer career, Pageable pageable) {
+    public ResponseEntity<?> getDataJob(String search,String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType,JobStatus status,Integer career,Integer salary,Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrinciple principal = (UserPrinciple) authentication.getPrincipal();
         String idUser = principal.getId();
-        if(search==null){
-            search="";
-        }
-        String jobEducationString = (jobEducation != null) ? jobEducation.toString() : "";
-        String jobExperienceString = (jobExperience != null) ? jobExperience.toString() : "";
-        String jobPositionString = (jobPosition != null) ? jobPosition.toString() : "";
-        String jobTypeString = (jobType != null) ? jobType.toString() : "";
-        Page<Job> jobs;
-        if(career== null){
-             jobs = jobRepository.getDataJobByPm(
-                    search,
-                    jobEducationString,
-                    jobExperienceString,
-                    jobPositionString,
-                    jobTypeString,
-                    idUser,
-                    pageable
-            );
+        BigDecimal startSalary = null;
+        BigDecimal endSalary = null;
+
+        if (salary != null) {
+            switch (salary) {
+                case 1:
+                    startSalary = BigDecimal.valueOf(0);
+                    endSalary = BigDecimal.valueOf(10000000);
+                    break;
+                case 2:
+                    startSalary = BigDecimal.valueOf(10000000);
+                    endSalary = BigDecimal.valueOf(20000000);
+                    break;
+                case 3:
+                    startSalary = BigDecimal.valueOf(20000000);
+                    endSalary = BigDecimal.valueOf(30000000);
+                    break;
+                case 4:
+                    startSalary = BigDecimal.valueOf(40000000);
+                    endSalary = BigDecimal.valueOf(50000000);
+                    break;
+                case 5:
+                    startSalary = BigDecimal.valueOf(50000000);
+                    endSalary = null;
+                    break;
+                default:
+                    return new ResponseEntity<>("Lỗi chon lương",HttpStatus.BAD_REQUEST);
+            }
         } else {
-            jobs = jobRepository.getDataJobByPmCareer(
-                    search,
-                    jobEducationString,
-                    jobExperienceString,
-                    jobPositionString,
-                    jobTypeString,
-                    career,
-                    idUser,
-                    pageable
-            );
+            startSalary = null;
+            endSalary = null;
         }
+
+
+        String jobEducationString = (jobEducation == null) ? null : jobEducation.toString();
+        String jobExperienceString = (jobExperience == null) ? null : jobExperience.toString();
+        String jobPositionString = (jobPosition == null) ? null : jobPosition.toString();
+        String jobTypeString = (jobType == null) ? null : jobType.toString();
+        String jobStatusString = (jobType == null) ? null : status.toString();
+        Page<Job> jobs= jobRepository.getDataJob(
+                search,searchAddress,
+                jobEducationString,
+                jobExperienceString,
+                jobPositionString,
+                jobTypeString,
+                jobStatusString,
+                career,
+                startSalary,
+                endSalary,
+                idUser,
+                pageable);
         return new ResponseEntity<>(jobs, HttpStatus.OK);
     }
 

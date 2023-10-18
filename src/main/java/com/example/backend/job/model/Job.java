@@ -1,5 +1,7 @@
 package com.example.backend.job.model;
 
+import com.example.backend.apply.model.ApplyJob;
+import com.example.backend.cv.model.Cv;
 import com.example.backend.job.constain.*;
 import com.example.backend.user.model.User;
 import com.fasterxml.jackson.annotation.*;
@@ -12,6 +14,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -81,4 +84,9 @@ public class Job {
     @JsonManagedReference
     @JsonIdentityReference(alwaysAsId = true)
     private User user;
+
+
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<ApplyJob> applyJobs= new HashSet<>();
 }

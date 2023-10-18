@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,14 +45,14 @@ public class JobAdminServiceImp implements JobAdminService{
     private CareerRepository careerRepository;
     @Autowired
     private JobUserSerivceImp jobUserSerivceImp;
-    @Override
-    public ResponseEntity<?> getAllDataListJob() {
-        List<Job> jobs= jobRepository.findAll();
-        if(jobs.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(jobs, HttpStatus.OK);
-    }
+//    @Override
+//    public ResponseEntity<?> getAllDataListJob() {
+//        List<Job> jobs= jobRepository.findAll();
+//        if(jobs.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//        return new ResponseEntity<>(jobs, HttpStatus.OK);
+//    }
 
     @Override
     public ResponseEntity<?> createJob(JobForm jobForm) {
@@ -140,12 +141,12 @@ public class JobAdminServiceImp implements JobAdminService{
         return new ResponseEntity<>("thay đổi trạng thái job thành công",HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<?> getAllDataListJobBySearch(String search, Pageable pageable) {
-        Page<Job> jobs= jobRepository.getAllDataListJobBySearch(search,pageable);
-
-        return new ResponseEntity<>(jobs,HttpStatus.OK);
-    }
+//    @Override
+//    public ResponseEntity<?> getAllDataListJobBySearch(String search, Pageable pageable) {
+//        Page<Job> jobs= jobRepository.getAllDataListJobBySearch(search,pageable);
+//
+//        return new ResponseEntity<>(jobs,HttpStatus.OK);
+//    }
 
     @Override
     public ResponseEntity<?> getqualityJob() {
@@ -281,8 +282,59 @@ public class JobAdminServiceImp implements JobAdminService{
     }
 
     @Override
-    public ResponseEntity<?> getDataJob(String search, String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, String salary, Integer career, JobStatus status, Pageable pageable) {
-        return new ResponseEntity<>(jobUserSerivceImp.getAllDataListJob(search, searchAddress,jobEducation,jobExperience,jobPosition, jobType,salary,career,status,pageable),HttpStatus.OK);
+    public ResponseEntity<?> getDataJob(String search, String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, Integer salary, Integer career, JobStatus status,String userId,Pageable pageable) {
+        BigDecimal startSalary = null;
+        BigDecimal endSalary = null;
+
+        if (salary != null) {
+            switch (salary) {
+                case 1:
+                    startSalary = BigDecimal.valueOf(0);
+                    endSalary = BigDecimal.valueOf(10000000);
+                    break;
+                case 2:
+                    startSalary = BigDecimal.valueOf(10000000);
+                    endSalary = BigDecimal.valueOf(20000000);
+                    break;
+                case 3:
+                    startSalary = BigDecimal.valueOf(20000000);
+                    endSalary = BigDecimal.valueOf(30000000);
+                    break;
+                case 4:
+                    startSalary = BigDecimal.valueOf(40000000);
+                    endSalary = BigDecimal.valueOf(50000000);
+                    break;
+                case 5:
+                    startSalary = BigDecimal.valueOf(50000000);
+                    endSalary = null;
+                    break;
+                default:
+                    return new ResponseEntity<>("Lỗi chon lương",HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            startSalary = null;
+            endSalary = null;
+        }
+
+
+        String jobEducationString = (jobEducation == null) ? null : jobEducation.toString();
+        String jobExperienceString = (jobExperience == null) ? null : jobExperience.toString();
+        String jobPositionString = (jobPosition == null) ? null : jobPosition.toString();
+        String jobTypeString = (jobType == null) ? null : jobType.toString();
+        String jobStatusString = (jobType == null) ? null : status.toString();
+        Page<Job> jobs= jobRepository.getDataJob(
+                search,searchAddress,
+                jobEducationString,
+                jobExperienceString,
+                jobPositionString,
+                jobTypeString,
+                jobStatusString,
+                career,
+                startSalary,
+                endSalary,
+                userId,
+                pageable);
+                return new ResponseEntity<>(jobs,HttpStatus.OK);
     }
 
     private JobGroupByUserMonth mapToJobGroupByUserMonth(Object[] row) {

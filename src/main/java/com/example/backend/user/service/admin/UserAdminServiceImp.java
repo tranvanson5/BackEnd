@@ -2,7 +2,7 @@ package com.example.backend.user.service.admin;
 
 import com.example.backend.authen.constain.RoleName;
 import com.example.backend.authen.model.Role;
-import com.example.backend.authen.repository.RoleReposetory;
+import com.example.backend.authen.repository.RoleRepository;
 import com.example.backend.user.constain.UserStatus;
 import com.example.backend.user.model.User;
 import com.example.backend.user.payload.request.UserFormCreate;
@@ -33,20 +33,10 @@ public class UserAdminServiceImp implements UserAdminService{
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private RoleReposetory roleReposetory;
+    private RoleRepository roleReposetory;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Override
-    public ResponseEntity<?> getAllUser() {
-        // Lấy danh sách tất cả người dùng từ UserRepository
-        List<User> users = userRepository.findAll();
-        if (users.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        // Trả về danh sách người dùng với mã HTTP OK
-        return ResponseEntity.ok(users);
-    }
     @Override
     public ResponseEntity<?> getUserById(String id) {
         Optional<User> user = userRepository.findById(id);
@@ -137,7 +127,7 @@ public class UserAdminServiceImp implements UserAdminService{
         return new ResponseEntity<>("Change status thành công", HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getAllUserBySearch(String search, Pageable pageable, String column, String sort) {
+    public ResponseEntity<?> getDataUser(String search, Pageable pageable, String column, String sort) {
         // Xác định thông tin sắp xếp
         Sort.Order order = null;
         if ("asc".equalsIgnoreCase(sort)) {
@@ -152,7 +142,7 @@ public class UserAdminServiceImp implements UserAdminService{
         // Tạo Pageable kết hợp cả phân trang và sắp xếp
         Pageable pageableWithSorting = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sorting);
 
-        Page<User> users = userRepository.getAllUserBySearch(search, pageableWithSorting);
+        Page<User> users = userRepository.getDataUser(search, pageableWithSorting);
 
         if (users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -2,6 +2,7 @@ package com.example.backend.user.model;
 
 
 import com.example.backend.authen.model.Role;
+import com.example.backend.cv.model.Cv;
 import com.example.backend.job.model.Job;
 import com.example.backend.user.constain.EGender;
 import com.example.backend.user.constain.UserStatus;
@@ -59,7 +60,12 @@ public class User {
     private LocalDateTime createAt;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
     @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     @JsonBackReference
     private Set<Job> jobs;
+
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<Cv> cvs= new HashSet<>();
 }

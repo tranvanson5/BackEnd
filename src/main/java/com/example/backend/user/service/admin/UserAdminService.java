@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 
 
 public interface UserAdminService {
-    ResponseEntity<?> getAllUser();
 
-    ResponseEntity<?> getAllUserBySearch(String search, Pageable pageable,String column, String sort);
+
+    ResponseEntity<?> getDataUser(String search, Pageable pageable,String column, String sort);
 
     ResponseEntity<?> countUsser();
 

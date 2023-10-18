@@ -22,25 +22,24 @@ public class JobAdminController {
     @Autowired
     private JobAdminService jobAdminService;
 
-    @GetMapping("/getAllDataListJob")
-    public ResponseEntity<?> getAllDataListJob() {
-        return jobAdminService.getAllDataListJob();
-    }
-//    public ResponseEntity<?> getAllDataListJobBySearch(@RequestParam String search, @PageableDefault Pageable pageable) {
-//        return jobAdminService.getAllDataListJobBySearch(search, pageable);
+//    @GetMapping("/getAllDataListJob")
+//    public ResponseEntity<?> getAllDataListJob() {
+//        return jobAdminService.getAllDataListJob();
 //    }
-    @GetMapping("/getAllDataListJobBySearch")
+
+    @GetMapping("/getAllDataJob")
     public ResponseEntity<?> getAllDataListJobBySearch(@RequestParam(required = false) String search,
                                                        @RequestParam(required = false) String searchAddress,
                                                        @RequestParam(required = false) JobEducation jobEducation,
                                                        @RequestParam(required = false) JobExperience jobExperience,
                                                        @RequestParam(required = false) JobPosition jobPosition,
                                                        @RequestParam(required = false) JobType jobType,
-                                                       @RequestParam(required = false) String salary,
+                                                       @RequestParam(required = false) Integer salary,
                                                        @RequestParam(required = false) Integer career,
-                                                       @RequestParam(required = false)JobStatus status,
+                                                       @RequestParam(required = false) JobStatus status,
+                                                       @RequestParam(required = false) String userId,
                                                        @PageableDefault Pageable pageable) {
-        return jobAdminService.getDataJob(search, searchAddress, jobEducation, jobExperience, jobPosition, jobType, salary, career, status, pageable);
+        return jobAdminService.getDataJob(search, searchAddress, jobEducation, jobExperience, jobPosition, jobType, salary, career, status,userId, pageable);
     }
     @PostMapping("/createJob")
     public ResponseEntity<?> createJob(@Valid @RequestBody JobForm jobForm) {
@@ -60,14 +59,13 @@ public class JobAdminController {
                                                   @RequestParam(name = "sort",required = false) String sort){
         return jobAdminService.jobGroupByUserBySort(pageable,sort);
     }
-
+    // thống kê
     @GetMapping("/jobGroupByUserMonth")
     public ResponseEntity<?> jobGroupByUserBySortMonth(@PageableDefault Pageable pageable,
                                                        @RequestParam(name = "sort",required = false) String sort,
                                                        @RequestParam(name = "year") int year){
         return jobAdminService.jobGroupByUserBySortMonth(pageable,sort,year);
     }
-    // thống kê
     @GetMapping("/getqualityJob")
     public ResponseEntity<?> getqualityJob() {
         return jobAdminService.getqualityJob();

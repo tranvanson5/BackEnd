@@ -19,13 +19,16 @@ public class JobPmController {
     private JobPmService jobPmService;
     @GetMapping("/getDataJob")
     public ResponseEntity<?> getDataJob(@RequestParam(required = false) String search,
+                                        @RequestParam(required = false) String searchAddress,
                                         @RequestParam(required = false) JobEducation jobEducation,
                                         @RequestParam(required = false) JobExperience jobExperience,
                                         @RequestParam(required = false) JobPosition jobPosition,
                                         @RequestParam(required = false) JobType jobType,
+                                        @RequestParam(required = false) JobStatus status,
                                         @RequestParam(required = false) Integer career,
+                                        @RequestParam(required = false) Integer salary,
                                         @PageableDefault Pageable pageable){
-        return jobPmService.getDataJob(search, jobEducation, jobExperience ,jobPosition, jobType ,career,pageable);
+        return jobPmService.getDataJob(search,searchAddress,jobEducation, jobExperience ,jobPosition, jobType,status ,career,salary,pageable);
     }
     @PostMapping("/createJob")
     public ResponseEntity<?> createJob(@RequestBody JobForm jobForm){

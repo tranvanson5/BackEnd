@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -15,175 +17,22 @@ import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job,String> {
-    @Query(
-            value = "SELECT * FROM job " +
-                    "WHERE job.id LIKE CONCAT(:search,'%') " +
-                    "OR job.title LIKE CONCAT('%',:search,'%') " +
-                    "OR job.company LIKE CONCAT('%',:search,'%')",
-            countQuery = "SELECT COUNT(*) FROM " +
-                    "(" +
-                    "SELECT * FROM job " +
-                    "WHERE job.id LIKE CONCAT(:search,'%') " +
-                    "OR job.title LIKE CONCAT('%',:search,'%') " +
-                    "OR job.company LIKE CONCAT('%',:search,'%')" +
-                    ") AS subquery",
-            nativeQuery = true
-    )
-    Page<Job> getAllDataListJobBySearch(@Param("search") String search, Pageable pageable);
-    @Query(
-            value =
-                    "SELECT DISTINCT j.* FROM job j " +
-                            "LEFT JOIN job_career jc ON j.id = jc.job_id AND :career IS NOT NULL " +
-                            "WHERE " +
-                            "   ((j.id LIKE CONCAT(:search, '%') OR j.title LIKE CONCAT('%', :search, '%') OR j.company LIKE CONCAT('%', :search, '%'))) " +
-                            "   AND j.address LIKE CONCAT('%', :searchAddress, '%') " +
-                            "   AND j.start_salary >= :startSalary " +
-                            "   AND j.end_salary <= :endSalary " +
-                            "   AND j.job_education LIKE CONCAT('%', :jobEducationString, '%') " +
-                            "   AND j.job_experience LIKE CONCAT('%', :jobExperienceString, '%') " +
-                            "   AND j.job_position LIKE CONCAT('%', :jobPositionString, '%') " +
-                            "   AND j.job_type LIKE CONCAT('%', :jobTypeString, '%') " +
-                            "   AND (j.job_status = :active OR (:active IS NULL AND (j.job_status = 'BLOCK' OR j.job_status = 'ACTIVE')))",
-            countQuery =
-                    "SELECT COUNT(*) FROM (" +
-                            "   SELECT DISTINCT j.* FROM job j " +
-                            "   LEFT JOIN job_career jc ON j.id = jc.job_id AND :career IS NOT NULL " +
-                            "   WHERE " +
-                            "       ((j.id LIKE CONCAT(:search, '%') OR j.title LIKE CONCAT('%', :search, '%') OR j.company LIKE CONCAT('%', :search, '%'))) " +
-                            "       AND j.address LIKE CONCAT('%', :searchAddress, '%') " +
-                            "       AND j.start_salary >= :startSalary " +
-                            "       AND j.end_salary <= :endSalary " +
-                            "       AND j.job_education LIKE CONCAT('%', :jobEducationString, '%') " +
-                            "       AND j.job_experience LIKE CONCAT('%', :jobExperienceString, '%') " +
-                            "       AND j.job_position LIKE CONCAT('%', :jobPositionString, '%') " +
-                            "       AND j.job_type LIKE CONCAT('%', :jobTypeString, '%')" +
-                            "       AND (j.job_status = :active OR (:active IS NULL AND (j.job_status = 'BLOCK' OR j.job_status = 'ACTIVE')))" +
-                            ") AS subquery",
-            nativeQuery = true
-    )
-    Page<Job> getAllDataListJobUserBySearch(
-            @Param("search") String search,
-            @Param("searchAddress") String searchAddress,
-            @Param("startSalary") BigDecimal startSalary,
-            @Param("endSalary") BigDecimal endSalary,
-            @Param("jobEducationString") String jobEducationString,
-            @Param("jobExperienceString") String jobExperienceString,
-            @Param("jobPositionString") String jobPositionString,
-            @Param("jobTypeString") String jobTypeString,
-            @Param("career") Integer career,
-            @Param("active") String active,
-            Pageable pageable
-    );
-
-
-
-
-
-
-
-    @Query(
-            value =
-                    "SELECT * FROM job " +
-                            "INNER JOIN job_career ON job.id = job_career.job_id " +
-                            "WHERE " +
-                            "( " +
-                            "   (job.id LIKE CONCAT(:search, '%') " +
-                            "   OR job.title LIKE CONCAT('%', :search, '%') " +
-                            "   OR job.company LIKE CONCAT('%', :search, '%') " +
-                            "   OR job.address LIKE CONCAT('%', :searchAddress, '%') " +
-                            ") " +
-                            "       AND (:jobEducation IS NULL OR job.job_education LIKE CONCAT('%', :jobEducation, '%')) " +
-                            "       AND (:jobExperience IS NULL OR job.job_experience LIKE CONCAT('%', :jobExperience, '%'))" +
-                            "       AND (:jobPosition IS NULL OR job.job_position LIKE CONCAT('%', :jobPosition, '%'))" +
-                            "       AND (:jobType IS NULL OR job.job_type LIKE CONCAT('%', :jobType, '%'))" +
-                            "       AND (job.start_salary >= :startSalary AND job.end_salary <= :endSalary)" +
-                            "       AND (job_career.career_id = :career)" +
-                            "AND job.job_status= :status" +
-                            ")",
-            countQuery =
-                    "SELECT COUNT(*) FROM (" +
-                            "   SELECT * FROM job " +
-                            "   INNER JOIN job_career ON job.id = job_career.job_id " +
-                            "   WHERE " +
-                            "   ( " +
-                            "       job.id LIKE CONCAT(:search, '%') " +
-                            "       OR job.title LIKE CONCAT('%', :search, '%') " +
-                            "       OR job.company LIKE CONCAT('%', :search, '%') " +
-                            "       OR job.address LIKE CONCAT('%', :searchAddress, '%') " +
-                            "   ) " +
-                            "   AND (:jobEducation IS NULL OR job.job_education LIKE CONCAT('%', :jobEducation, '%')) " +
-                            "   AND (:jobExperience IS NULL OR job.job_experience LIKE CONCAT('%', :jobExperience, '%')) " +
-                            "   AND (:jobPosition IS NULL OR job.job_position LIKE CONCAT('%', :jobPosition, '%')) " +
-                            "   AND (:jobType IS NULL OR job.job_type LIKE CONCAT('%', :jobType, '%')) " +
-                            "   AND (job.start_salary >= :startSalary AND job.end_salary <= :endSalary)" +
-                            "   AND (job_career.career_id = :career)" +
-                            "   AND job.job_status= :status" +
-                            ") AS subquery",
-            nativeQuery = true
-    )
-    Page<Job> getAllDataListJobUserBySearchByCareer(
-            @Param("search") String search,
-            @Param("searchAddress") String searchAddress,
-            @Param("jobEducation") String jobEducation,
-            @Param("jobExperience") String jobExperience,
-            @Param("jobPosition") String jobPosition,
-            @Param("jobType") String jobType,
-            @Param("startSalary") BigDecimal startSalary,
-            @Param("endSalary") BigDecimal endSalary,
-            @Param("career") int career,
-            @Param("status") String status,
-            Pageable pageable
-    );
+//    @Query(
+//            value = "SELECT * FROM job " +
+//                    "WHERE job.id LIKE CONCAT(:search,'%') " +
+//                    "OR job.title LIKE CONCAT('%',:search,'%') " +
+//                    "OR job.company LIKE CONCAT('%',:search,'%')",
+//            countQuery = "SELECT COUNT(*) FROM " +
+//                    "(" +
+//                    "SELECT * FROM job " +
+//                    "WHERE job.id LIKE CONCAT(:search,'%') " +
+//                    "OR job.title LIKE CONCAT('%',:search,'%') " +
+//                    "OR job.company LIKE CONCAT('%',:search,'%')" +
+//                    ") AS subquery",
+//            nativeQuery = true
+//    )
+//    Page<Job> getAllDataListJobBySearch(@Param("search") String search, Pageable pageable);
     Optional<Job> findByIdAndUser(String id,User user);
-    @Query(
-            value = "SELECT * FROM job " +
-                    "WHERE user_id = :idUser " +
-                    "AND (job.id LIKE CONCAT(:search, '%') OR job.title LIKE CONCAT('%', :search, '%') OR job.company LIKE CONCAT('%', :search, '%') OR job.address LIKE CONCAT('%', :search, '%'))" +
-                    "AND (job.job_education LIKE CONCAT('%', :jobEducationString, '%') AND job.job_experience LIKE CONCAT('%', :jobExperienceString, '%') AND job.job_position LIKE CONCAT('%', :jobPositionString, '%') AND job.job_type LIKE CONCAT('%', :jobTypeString, '%'))" +
-                    "AND job.job_status <> 'DELETE'",
-            countQuery = "SELECT COUNT(*) FROM job " +
-                    "WHERE user_id = :idUser " +
-                    "AND (job.id LIKE CONCAT(:search, '%') OR job.title LIKE CONCAT('%', :search, '%') OR job.company LIKE CONCAT('%', :search, '%') OR job.address LIKE CONCAT('%', :search, '%'))" +
-                    "AND (job.job_education LIKE CONCAT('%', :jobEducationString, '%') AND job.job_experience LIKE CONCAT('%', :jobExperienceString, '%') AND job.job_position LIKE CONCAT('%', :jobPositionString, '%') AND job.job_type LIKE CONCAT('%', :jobTypeString, '%'))" +
-                    "AND job.job_status <> 'DELETE'",
-            nativeQuery = true
-    )
-    Page<Job> getDataJobByPm(
-            @Param("search") String search,
-            @Param("jobEducationString") String jobEducationString,
-            @Param("jobExperienceString") String jobExperienceString,
-            @Param("jobPositionString") String jobPositionString,
-            @Param("jobTypeString") String jobTypeString,
-            @Param("idUser") String idUser,
-            Pageable pageable
-    );
-    @Query(
-            value = "SELECT * FROM job " +
-                    "INNER JOIN job_career ON job.id = job_career.job_id " +
-                    "WHERE user_id = :idUser " +
-                    "AND (job.id LIKE CONCAT(:search, '%') OR job.title LIKE CONCAT('%', :search, '%') OR job.company LIKE CONCAT('%', :search, '%') OR job.address LIKE CONCAT('%', :search, '%'))" +
-                    "AND (job.job_education LIKE CONCAT('%', :jobEducationString, '%') AND job.job_experience LIKE CONCAT('%', :jobExperienceString, '%') AND job.job_position LIKE CONCAT('%', :jobPositionString, '%') AND job.job_type LIKE CONCAT('%', :jobTypeString, '%'))" +
-                    "AND job_career.career_id = :career " +
-                    "AND job.job_status <> 'DELETE'",
-            countQuery = "SELECT COUNT(*) FROM job " +
-                    "INNER JOIN job_career ON job.id = job_career.job_id " +
-                    "WHERE user_id = :idUser " +
-                    "AND (job.id LIKE CONCAT(:search, '%') OR job.title LIKE CONCAT('%', :search, '%') OR job.company LIKE CONCAT('%', :search, '%') OR job.address LIKE CONCAT('%', :search, '%'))" +
-                    "AND (job.job_education LIKE CONCAT('%', :jobEducationString, '%') AND job.job_experience LIKE CONCAT('%', :jobExperienceString, '%') AND job.job_position LIKE CONCAT('%', :jobPositionString, '%') AND job.job_type LIKE CONCAT('%', :jobTypeString, '%'))" +
-                    "AND job_career.career_id = :career " +
-                    "AND job.job_status <> 'DELETE'",
-            nativeQuery = true
-    )
-    Page<Job> getDataJobByPmCareer(
-            @Param("search") String search,
-            @Param("jobEducationString") String jobEducationString,
-            @Param("jobExperienceString") String jobExperienceString,
-            @Param("jobPositionString") String jobPositionString,
-            @Param("jobTypeString") String jobTypeString,
-            @Param("career") Integer career,
-            @Param("idUser") String idUser,
-            Pageable pageable
-    );
 
     @Query(
             value = "SELECT COUNT(*) FROM job WHERE  job.user_id=userId",
@@ -299,4 +148,49 @@ public interface JobRepository extends JpaRepository<Job,String> {
             nativeQuery = true
     )
     Page<Object[]> jobGroupByUserBySortYear(Pageable pageable, String sortFc);
+
+    @Query(
+            value = "SELECT * FROM job " +
+                    "LEFT JOIN job_career ON (CASE WHEN :career IS NOT NULL THEN job.id ELSE 1 END) = job_career.job_id " +
+                    "WHERE (:search IS NULL OR job.id LIKE CONCAT(:search,'%') OR job.title LIKE CONCAT('%',:search,'%') OR job.company LIKE CONCAT('%',:search,'%')) " +
+                    "AND (:searchAddress IS NULL OR job.address LIKE CONCAT('%',:searchAddress,'%')) " +
+                    "AND (:jobEducationString IS NULL OR job.job_education = :jobEducationString) " +
+                    "AND (:jobExperienceString IS NULL OR job.job_experience = :jobExperienceString) " +
+                    "AND (:jobPositionString IS NULL OR job.job_position = :jobPositionString) " +
+                    "AND (:jobTypeString IS NULL OR job.job_type = :jobTypeString) " +
+                    "AND (:status IS NULL OR job.job_status = :status) " +
+                    "AND (:startSalary IS NULL OR job.start_salary <= :startSalary) " +
+                    "AND (:endSalary IS NULL OR job.end_salary >= :endSalary) " +
+                    "AND (:userId IS NULL OR job.user_id = :userId) " +
+                    "AND (:career IS NULL OR job_career.career_id = :career)",
+            countQuery = "SELECT count(*) FROM job " +
+                    "LEFT JOIN job_career ON (CASE WHEN :career IS NOT NULL THEN job.id ELSE 1 END) = job_career.job_id " +
+                    "WHERE (:search IS NULL OR job.id LIKE CONCAT(:search,'%') OR job.title LIKE CONCAT('%',:search,'%') OR job.company LIKE CONCAT('%',:search,'%')) " +
+                    "AND (:searchAddress IS NULL OR job.address LIKE CONCAT('%',:searchAddress,'%')) " +
+                    "AND (:jobEducationString IS NULL OR job.job_education = :jobEducationString) " +
+                    "AND (:jobExperienceString IS NULL OR job.job_experience = :jobExperienceString) " +
+                    "AND (:jobPositionString IS NULL OR job.job_position = :jobPositionString) " +
+                    "AND (:jobTypeString IS NULL OR job.job_type = :jobTypeString) " +
+                    "AND (:status IS NULL OR job.job_status = :status) " +
+                    "AND (:startSalary IS NULL OR job.start_salary <= :startSalary) " +
+                    "AND (:endSalary IS NULL OR job.end_salary >= :endSalary) " +
+                    "AND (:userId IS NULL OR job.user_id = :userId) " +
+                    "AND (:career IS NULL OR job_career.career_id = :career)",
+            nativeQuery = true
+    )
+    Page<Job> getDataJob(
+            @Param("search") String search,
+            @Param("searchAddress") String searchAddress,
+            @Param("jobEducationString") String jobEducationString,
+            @Param("jobExperienceString") String jobExperienceString,
+            @Param("jobPositionString") String jobPositionString,
+            @Param("jobTypeString") String jobTypeString,
+            @Param("status") String status,
+            @Param("career") Integer career,
+            @Param("startSalary") BigDecimal startSalary,
+            @Param("endSalary") BigDecimal endSalary,
+            @Param("userId") String userId,
+            Pageable pageable
+    );
+
 }

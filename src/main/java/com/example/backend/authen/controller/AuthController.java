@@ -1,5 +1,6 @@
 package com.example.backend.authen.controller;
 
+import com.example.backend.authen.payload.request.RestPassword;
 import com.example.backend.authen.payload.request.SignInForm;
 import com.example.backend.authen.payload.request.SignUpForm;
 import com.example.backend.authen.service.auth.AuthService;
@@ -23,5 +24,17 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> authenticateSignUpUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletRequest request) {
         return authService.SignUp(signUpForm);
+    }
+    @GetMapping("/forgot_password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email){
+        return authService.generateOtpForgotPassword(email);
+    }
+    @GetMapping("/veritify_otp")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String otp){
+        return authService.veritifyOtpForgotPassword(email,otp);
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody RestPassword password,HttpServletRequest request){
+        return authService.resetPassword(password,request);
     }
 }

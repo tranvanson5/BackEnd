@@ -17,13 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserAdminController {
     @Autowired
     private UserAdminService userAdminService;
-    @GetMapping("/getAllUser")
-    public ResponseEntity<?> getAllUser() {
-        return userAdminService.getAllUser();
-    }
-    @GetMapping("/getAllUserBySearch")
-    public ResponseEntity<?> getAllUserBySearch(@RequestParam String search, @PageableDefault(5) Pageable pageable,@RequestParam String column,@RequestParam String sort) {
-        return userAdminService.getAllUserBySearch(search,pageable,column,sort);
+    @GetMapping("/getDataUser")
+    public ResponseEntity<?> getDataUser(@RequestParam(required = false) String search,
+                                                @PageableDefault(5) Pageable pageable,
+                                                @RequestParam(required = false) String column,
+                                                @RequestParam(required = false)  String sort) {
+        return userAdminService.getDataUser(search,pageable,column,sort);
     }
     @GetMapping("/getUserById")
     public ResponseEntity<?> getUserById(@RequestParam String id){

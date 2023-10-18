@@ -11,7 +11,7 @@ public interface JobPmService {
 
     ResponseEntity<?> updateJob(JobForm jobForm);
 
-    ResponseEntity<?> getDataJob(String search, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, Integer career, Pageable pageable);
+    ResponseEntity<?> getDataJob(String search,String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType,JobStatus status ,Integer career,Integer salary,Pageable pageable);
 
     ResponseEntity<?> getqualityJob();
 

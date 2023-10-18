@@ -7,14 +7,14 @@ import org.springframework.http.ResponseEntity;
 
 
 public interface JobAdminService {
-    ResponseEntity<?> getAllDataListJob();
+//    ResponseEntity<?> getAllDataListJob();
 
     ResponseEntity<?> createJob(JobForm jobForm);
 
     ResponseEntity<?> updateJob(JobForm jobForm);
     ResponseEntity<?> changeStatusJob(String id, JobStatus jobStatus);
 
-    ResponseEntity<?> getAllDataListJobBySearch(String search, Pageable pageable);
+//    ResponseEntity<?> getAllDataListJobBySearch(String search, Pageable pageable);
 
     ResponseEntity<?> getqualityJob();
 
@@ -36,5 +36,5 @@ public interface JobAdminService {
 
     ResponseEntity<?> jobGroupByUserBySortYear(Pageable pageable, String sort);
 
-    ResponseEntity<?> getDataJob(String search, String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, String salary, Integer career, JobStatus status, Pageable pageable);
+    ResponseEntity<?> getDataJob(String search, String searchAddress, JobEducation jobEducation, JobExperience jobExperience, JobPosition jobPosition, JobType jobType, Integer salary, Integer career, JobStatus status, String userId,Pageable pageable);
 }
